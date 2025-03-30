@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      :root {
+        --font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN",
+          "Hiragino Sans", Meiryo, sans-serif;
+        --text-color: #243f6b;
+        --background-color: #fdfdfd75;
+        --background-gray: #f7f7f7;
+        --main-color: #6c8d3f;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        font-size: 18px;
+      }
+      body {
+        font-family: var(--font-family);
+        color: var(--text-color);
+        background-color: var(--background-color);
+      }
+      .app-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 30px 10px;
+        overflow: scroll;
+        row-gap: 20px;
+      }
+      .app-display-main {
+        padding: 10px;
+      }
+      label,
+      p,
+      input,
+      button {
+        font-size: 1rem;
+        color: var(--text-color);
+      }
+      input,
+      button {
+        border: none;
+        background-color: var(--background-gray);
+        padding: 10px 15px;
+        font-weight: 700;
+      }
+      .execution-button {
+        width: 100px;
+        max-width: 100%;
+        border-radius: 100px;
+        transition: box-shadow 0.25s;
+        background-color: var(--main-color);
+        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1),
+          0 4px 8px -4px rgba(0, 0, 0, 0.2);
+        color: #f7f7f7;
+      }
+      .execution-button:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1),
+          0 12px 24px -12px rgba(0, 0, 0, 0.2);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse; /* セルの枠線を重ねる */
+      }
+
+      th {
+        border: solid 1px var(--text-color);
+        padding: 10px;
+      }
+
+      td {
+        border: solid 1px var(--text-color);
+        padding: 10px;
+        text-align: center;
+      }
+      .age {
+        background-color: var(--text-color);
+        color: var(--background-gray);
+        border: none;
+      }
+
+      input[type="radio"] {
+        display: none;
+      }
+
+      /* ラジオボタンが選択された時のlabelスタイル */
+      input[type="radio"]:checked + label {
+        background-color: var(--main-color); /* 選択時の背景色 */
+        color: var(--background-gray);
+      }
+
+      /* 通常時のlabelスタイル */
+      .app-gender-form label {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: var(--background-gray);
+        cursor: pointer;
+      }
+    </style>
+    <title>毎年のエレメントの変化の傾向</title>
+  </head>
+  <body>
+    <div class="app-display">
+      <!--日付、　性別を入力するところ-->
+      <div class="app-date-form">
+        <p><label for="birthday">日付を入力</label></p>
+        <input type="date" id="birthday" />
+      </div>
+      <div class="app-gender-form">
+        <input type="radio" name="gender" value="10" id="woman" />
+        <label for="woman"> 女性 </label>
+        <input type="radio" name="gender" value="9" id="man" />
+        <label for="man"> 男性 </label>
+      </div>
+
+      <p id="caveat" class="caveat"></p>
+      <button onclick="Execution();" id="execution" class="execution-button">
+        実行
+      </button>
+      <!--結果が描写されるところ-->
+      <div class="app-display-main">
+        <table id="app_table" class="app-table"></table>
+      </div>
+    </div>
+    <script>
+      const medical_data = [
+        {
+          year: 1917,
+          date: "02-25",
+        },
+        {
+          year: 1918,
+          date: "03-17",
+        },
+        {
+          year: 1919,
+          date: "03-05",
+        },
+        {
+          year: 1920,
+          date: "03-24",
+        },
+        {
+          year: 1921,
+          date: "03-13",
+        },
+        {
+          year: 1922,
+          date: "03-02",
+        },
+        {
+          year: 1923,
+          date: "03-20",
+        },
+        {
+          year: 1924,
+          date: "03-09",
+        },
+        {
+          year: 1925,
+          date: "02-27",
+        },
+        {
+          year: 1926,
+          date: "03-18",
+        },
+        {
+          year: 1927,
+          date: "03-06",
+        },
+        {
+          year: 1928,
+          date: "03-25",
+        },
+        {
+          year: 1929,
+          date: "03-14",
+        },
+        {
+          year: 1930,
+          date: "03-04",
+        },
+        {
+          year: 1931,
+          date: "03-22",
+        },
+        {
+          year: 1932,
+          date: "03-11",
+        },
+        {
+          year: 1933,
+          date: "02-28",
+        },
+        {
+          year: 1934,
+          date: "03-20",
+        },
+        {
+          year: 1935,
+          date: "03-08",
+        },
+        {
+          year: 1936,
+          date: "02-25",
+        },
+        {
+          year: 1937,
+          date: "03-16",
+        },
+        {
+          year: 1938,
+          date: "03-05",
+        },
+        {
+          year: 1939,
+          date: "03-24",
+        },
+        {
+          year: 1940,
+          date: "03-13",
+        },
+        {
+          year: 1941,
+          date: "03-13",
+        },
+        {
+          year: 1942,
+          date: "03-02",
+        },
+        {
+          year: 1943,
+          date: "03-21",
+        },
+        {
+          year: 1944,
+          date: "03-09",
+        },
+        {
+          year: 1945,
+          date: "02-26",
+        },
+        {
+          year: 1946,
+          date: "03-18",
+        },
+        {
+          year: 1947,
+          date: "03-07",
+        },
+        {
+          year: 1948,
+          date: "03-25",
+        },
+        {
+          year: 1949,
+          date: "03-14",
+        },
+        {
+          year: 1950,
+          date: "03-03",
+        },
+        {
+          year: 1951,
+          date: "03-23",
+        },
+        {
+          year: 1952,
+          date: "03-11",
+        },
+        {
+          year: 1953,
+          date: "02-28",
+        },
+        {
+          year: 1954,
+          date: "03-19",
+        },
+        {
+          year: 1955,
+          date: "03-08",
+        },
+        {
+          year: 1956,
+          date: "02-26",
+        },
+        {
+          year: 1957,
+          date: "03-16",
+        },
+        {
+          year: 1958,
+          date: "03-05",
+        },
+        {
+          year: 1959,
+          date: "03-24",
+        },
+        {
+          year: 1960,
+          date: "03-12",
+        },
+        {
+          year: 1961,
+          date: "03-01",
+        },
+        {
+          year: 1962,
+          date: "03-21",
+        },
+        {
+          year: 1963,
+          date: "03-10",
+        },
+        {
+          year: 1964,
+          date: "02-27",
+        },
+        {
+          year: 1965,
+          date: "03-17",
+        },
+        {
+          year: 1966,
+          date: "03-06",
+        },
+        {
+          year: 1967,
+          date: "03-26",
+        },
+        {
+          year: 1968,
+          date: "03-14",
+        },
+        {
+          year: 1969,
+          date: "03-03",
+        },
+        {
+          year: 1970,
+          date: "03-22",
+        },
+        {
+          year: 1971,
+          date: "03-11",
+        },
+        {
+          year: 1972,
+          date: "03-29",
+        },
+        {
+          year: 1973,
+          date: "03-19",
+        },
+        {
+          year: 1974,
+          date: "03-08",
+        },
+        {
+          year: 1975,
+          date: "03-27",
+        },
+        {
+          year: 1976,
+          date: "03-15",
+        },
+        {
+          year: 1977,
+          date: "03-04",
+        },
+        {
+          year: 1978,
+          date: "03-24",
+        },
+        {
+          year: 1979,
+          date: "03-13",
+        },
+        {
+          year: 1980,
+          date: "03-01",
+        },
+        {
+          year: 1981,
+          date: "03-21",
+        },
+        {
+          year: 1982,
+          date: "03-10",
+        },
+        {
+          year: 1983,
+          date: "02-27",
+        },
+        {
+          year: 1984,
+          date: "02-17",
+        },
+        {
+          year: 1985,
+          date: "03-06",
+        },
+        {
+          year: 1986,
+          date: "03-25",
+        },
+        {
+          year: 1987,
+          date: "03-14",
+        },
+        {
+          year: 1988,
+          date: "03-03",
+        },
+        {
+          year: 1989,
+          date: "03-22",
+        },
+        {
+          year: 1990,
+          date: "03-11",
+        },
+        {
+          year: 1991,
+          date: "02-28",
+        },
+        {
+          year: 1992,
+          date: "03-19",
+        },
+        {
+          year: 1993,
+          date: "03-08",
+        },
+        {
+          year: 1994,
+          date: "03-27",
+        },
+        {
+          year: 1995,
+          date: "03-16",
+        },
+        {
+          year: 1996,
+          date: "03-04",
+        },
+        {
+          year: 1997,
+          date: "03-24",
+        },
+        {
+          year: 1998,
+          date: "03-13",
+        },
+        {
+          year: 1999,
+          date: "03-02",
+        },
+        {
+          year: 2000,
+          date: "03-20",
+        },
+        {
+          year: 2001,
+          date: "03-09",
+        },
+        {
+          year: 2002,
+          date: "03-01",
+        },
+        {
+          year: 2003,
+          date: "03-18",
+        },
+        {
+          year: 2004,
+          date: "03-06",
+        },
+        {
+          year: 2005,
+          date: "03-25",
+        },
+        {
+          year: 2006,
+          date: "03-14",
+        },
+        {
+          year: 2007,
+          date: "03-03",
+        },
+        {
+          year: 2008,
+          date: "03-22",
+        },
+        {
+          year: 2009,
+          date: "03-11",
+        },
+        {
+          year: 2010,
+          date: "02-28",
+        },
+        {
+          year: 2011,
+          date: "03-19",
+        },
+        {
+          year: 2012,
+          date: "03-07",
+        },
+        {
+          year: 2013,
+          date: "03-27",
+        },
+        {
+          year: 2014,
+          date: "03-16",
+        },
+        {
+          year: 2015,
+          date: "03-05",
+        },
+        {
+          year: 2016,
+          date: "03-23",
+        },
+        {
+          year: 2017,
+          date: "03-12",
+        },
+        {
+          year: 2018,
+          date: "03-02",
+        },
+        {
+          year: 2019,
+          date: "03-21",
+        },
+        {
+          year: 2020,
+          date: "03-09",
+        },
+        {
+          year: 2021,
+          date: "02-26",
+        },
+        {
+          year: 2022,
+          date: "03-18",
+        },
+        {
+          year: 2023,
+          date: "03-07",
+        },
+        {
+          year: 2024,
+          date: "03-25",
+        },
+        {
+          year: 2025,
+          date: "03-14",
+        },
+        {
+          year: 2026,
+          date: "03-03",
+        },
+        {
+          year: 2027,
+          date: "03-22",
+        },
+        {
+          year: 2028,
+          date: "03-10",
+        },
+        {
+          year: 2029,
+          date: "02-28",
+        },
+        {
+          year: 2030,
+          date: "03-19",
+        },
+        {
+          year: 2031,
+          date: "03-08",
+        },
+        {
+          year: 2032,
+          date: "03-26",
+        },
+        {
+          year: 2033,
+          date: "03-15",
+        },
+        {
+          year: 2034,
+          date: "03-05",
+        },
+        {
+          year: 2035,
+          date: "03-24",
+        },
+        {
+          year: 2036,
+          date: "03-12",
+        },
+        {
+          year: 2037,
+          date: "03-01",
+        },
+        {
+          year: 2038,
+          date: "03-21",
+        },
+        {
+          year: 2039,
+          date: "03-10",
+        },
+        {
+          year: 2040,
+          date: "02-27",
+        },
+        {
+          year: 2041,
+          date: "03-17",
+        },
+        {
+          year: 2042,
+          date: "03-06",
+        },
+      ];
+      let caveat;
+
+      let age_number;
+      let gender_number;
+      let day_number;
+      let eto_number;
+      let month_number;
+
+      const Caveat = () => {
+        document.getElementById("caveat").innerHTML = caveat;
+      };
+
+      const Execution = () => {
+        caveat = "";
+        const birthday = document.getElementById("birthday").value;
+        const gender = document.querySelector('input[name="gender"]:checked');
+        if (
+          birthday === "" ||
+          birthday === undefined ||
+          birthday === NaN ||
+          birthday === null
+        ) {
+          caveat += "日付を入力してください<br/>";
+          Caveat();
+          return;
+        }
+        if (
+          gender === "" ||
+          gender === undefined ||
+          gender === NaN ||
+          gender === null
+        ) {
+          caveat += "性別を入力してください<br/>";
+          Caveat();
+          return;
+        }
+
+        age_number = Age(birthday);
+        gender_number = Number(gender.value);
+        day_number = DayGet(birthday);
+        month_number = MonthGroup(birthday);
+        eto_number = Eto(birthday);
+
+        console.log(
+          age_number,
+          gender_number,
+          day_number,
+          month_number,
+          eto_number
+        );
+
+        const array = Calu();
+        console.log(array);
+        const table = GenerateTable(array);
+        Draw(table);
+
+        Caveat();
+      };
+
+      const DayGet = (birthday) => {
+        const birth_date = new Date(birthday);
+        return birth_date.getDay() + 1;
+      };
+
+      const MonthGroup = (birthday) => {
+        const birth_date = new Date(birthday);
+        const month = birth_date.getMonth() + 1;
+        if ([12, 1, 2].includes(month)) return 1;
+        if ([3, 4, 5].includes(month)) return 2;
+        if ([6, 7, 8].includes(month)) return 3;
+        if ([9, 10, 11].includes(month)) return 4;
+        return null; // 無効な月の場合
+      };
+
+      const Age = (birthday) => {
+        const today = new Date();
+        const birth_date = new Date(birthday);
+
+        let age = today.getFullYear() - birth_date.getFullYear();
+        const month_diff = today.getMonth() - birth_date.getMonth();
+
+        if (
+          month_diff < 0 ||
+          (month_diff === 0 && today.getDate() < birth_date.getDate())
+        ) {
+          age--;
+        }
+
+        return age;
+      };
+
+      //裏面のものを計算する.
+      const Medical = (birthday) => {
+        const birthday_year = birthday.getFullYear();
+        const date = medical_data.find(({ year }) => year === birthday_year);
+        if (date) {
+          const days = new Date(birthday_year + "-" + date.date);
+          return days;
+        } else {
+          caveat += "西暦1917年〜2042年の範囲で入力してください。<br/>";
+        }
+      };
+
+      const Eto = (birthday) => {
+        const birth_date = new Date(birthday);
+        const ref_date = Medical(birth_date);
+
+        // 干支計算（子=1 〜 亥=12）
+        let etoNumber = ((((birth_date.getFullYear() - 4) % 12) + 12) % 12) + 1;
+        if (birth_date < ref_date) {
+          etoNumber -= 1;
+        }
+        return etoNumber;
+      };
+
+      const Total = (age, number) => {
+        return (
+          (age_number +
+            gender_number +
+            day_number +
+            month_number +
+            eto_number +
+            age +
+            number) %
+          4
+        );
+      };
+
+      const Calu = () => {
+        return [
+          {
+            class_name: "age",
+            name: "年齢",
+            this_year: age_number,
+            last_year: age_number - 1,
+            next_year: age_number + 1,
+          },
+          {
+            class_name: "",
+            name: "土",
+            this_year: Total(0, 20),
+            last_year: Total(-1, 20),
+            next_year: Total(1, 20),
+          },
+          {
+            class_name: "",
+            name: "水",
+            this_year: Total(0, 12),
+            last_year: Total(-1, 12),
+            next_year: Total(1, 12),
+          },
+          {
+            class_name: "",
+            name: "風",
+            this_year: Total(0, 6),
+            last_year: Total(-1, 6),
+            next_year: Total(1, 6),
+          },
+          {
+            class_name: "",
+            name: "日",
+            this_year: Total(0, 4),
+            last_year: Total(-1, 4),
+            next_year: Total(1, 4),
+          },
+        ];
+      };
+      const GenerateTable = (array) => {
+        const table = array.reduce((acc, cur) => {
+          return (
+            acc +
+            `<tr class="${cur.class_name}"><th>${cur.name}</th><td>${cur.last_year}</td><td>${cur.this_year}</td><td>${cur.next_year}</td></tr>`
+          );
+        }, "");
+        return table;
+      };
+      const Draw = (data) => {
+        const table = document.getElementById("app_table");
+        table.innerHTML = data;
+      };
+    </script>
+  </body>
+</html>
