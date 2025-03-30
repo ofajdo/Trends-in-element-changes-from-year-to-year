@@ -722,7 +722,7 @@
                 data: value.year,
                 borderColor: value.color,
                 backgroundColor: value.color,
-                lineTension: 0.5,
+                lineTension: 0.4,
               };
             }),
             options: {
@@ -821,30 +821,30 @@
           {
             class_name: "age",
             name: "年齢",
-            year: [age_number - 1, age_number, age_number + 1],
+            year: [age_number - 1, age_number, age_number + 1, age_number + 2],
           },
           {
             class_name: "",
             name: "土",
-            year: [Total(-1, 20), Total(0, 20), Total(1, 20)],
+            year: [Total(-1, 20), Total(0, 20), Total(1, 20), Total(2, 20)],
             color: "#bc7b3d",
           },
           {
             class_name: "",
             name: "水",
-            year: [Total(-1, 12), Total(0, 12), Total(1, 12)],
+            year: [Total(-1, 12), Total(0, 12), Total(1, 12), Total(2, 12)],
             color: "#96b9d9",
           },
           {
             class_name: "",
             name: "風",
-            year: [Total(-1, 6), Total(0, 6), Total(1, 6)],
+            year: [Total(-1, 6), Total(0, 6), Total(1, 6), Total(2, 6)],
             color: "#a4bfda",
           },
           {
             class_name: "",
-            name: "日",
-            year: [Total(-1, 4), Total(0, 4), Total(1, 4)],
+            name: "火",
+            year: [Total(-1, 4), Total(0, 4), Total(1, 4), Total(2, 4)],
             color: "#f2c572",
           },
         ];
@@ -858,6 +858,7 @@
               <td>${cur.year[0]}</td>
               <td>${cur.year[1]}</td>
               <td>${cur.year[2]}</td>
+              <td>${cur.year[3]}</td>
             </tr>`
           );
         }, "");
