@@ -681,6 +681,7 @@
         day_number = DayGet(birthday);
         month_number = MonthGroup(birthday);
         eto_number = Eto(birthday);
+        if (!eto_number) return;
 
         const array = Calu();
         const table = GenerateTable(array);
@@ -781,12 +782,18 @@
           return days;
         } else {
           caveat += "西暦1917年〜2042年の範囲で入力してください。<br/>";
+          Caveat();
+          return null;
         }
       };
 
       const Eto = (birthday) => {
         const birth_date = new Date(birthday);
         const ref_date = Medical(birth_date);
+
+        if (!ref_date) {
+          return;
+        }
 
         // 干支計算（子=1 〜 亥=12）
         let etoNumber = ((((birth_date.getFullYear() - 4) % 12) + 12) % 12) + 1;
