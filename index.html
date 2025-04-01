@@ -21,6 +21,7 @@
       html {
         font-size: 18px;
       }
+
       body {
         font-family: var(--font-family);
         color: var(--text-color);
@@ -32,7 +33,9 @@
         align-items: center;
         padding: 30px 10px;
         overflow: scroll;
-        row-gap: 20px;
+        row-gap: 15px;
+        max-width: 600px;
+        margin: 0 auto;
       }
       .app-display-main {
         padding: 10px;
@@ -80,7 +83,7 @@
         padding: 10px;
         text-align: center;
       }
-      .age {
+      .app-table tr:first-child {
         background-color: var(--text-color);
         color: var(--background-gray);
         border: none;
@@ -96,24 +99,44 @@
         color: var(--background-gray);
       }
 
+      input {
+        width: 200px;
+        max-width: 100%;
+      }
+
       /* 通常時のlabelスタイル */
       .app-gender-form label {
         display: inline-block;
         padding: 10px 15px;
         background-color: var(--background-gray);
+        font-weight: 700;
         cursor: pointer;
       }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .caveat {
+        font-weight: 700;
+      }
     </style>
-    <title>毎年のエレメントの変化の傾向</title>
+    <title>今年の診断</title>
   </head>
   <body>
     <div class="app-display">
       <!--日付、　性別を入力するところ-->
+      <h1>タイエレメント運気診断</h1>
+      <div class="app-name-form">
+        <p><label for="name">名前</label></p>
+        <input type="text" id="name" />
+      </div>
       <div class="app-date-form">
-        <p><label for="birthday">日付を入力</label></p>
+        <p><label for="birthday">診断したい日付</label></p>
         <input type="date" id="birthday" />
       </div>
       <div class="app-gender-form">
+        <p>性別</p>
         <input type="radio" name="gender" value="10" id="woman" />
         <label for="woman"> 女性 </label>
         <input type="radio" name="gender" value="9" id="man" />
@@ -122,12 +145,13 @@
 
       <p id="caveat" class="caveat"></p>
       <button onclick="Execution();" id="execution" class="execution-button">
-        実行
+        診断
       </button>
       <!--結果が描写されるところ-->
       <div class="app-display-main">
         <table id="app_table" class="app-table"></table>
       </div>
+      <p id="info"></p>
       <canvas id="chart"></canvas>
     </div>
 
@@ -685,27 +709,18 @@
 
         const array = Calu();
         const table = GenerateTable(array);
-        Draw(table);
+        Draw({ table: table, date: birthday });
 
         GraphDrawing(array);
 
         Caveat();
       };
-
       const GraphDrawing = (array) => {
         const ctx = document.getElementById("chart").getContext("2d");
 
         const age = array.filter(({ class_name }) => class_name === "age");
-        const not_age = array.filter(({ class_name }) => class_name !== "age");
-        console.log(age[0].year, not_age);
-        console.log(
-          not_age.map((value) => {
-            return {
-              label: value.name,
-              data: value.year,
-              borderColor: value.color,
-            };
-          })
+        const not_age = array.filter(
+          ({ class_name }) => class_name !== "age" && class_name !== "overview"
         );
 
         if (Chart.getChart(ctx)) {
@@ -725,17 +740,14 @@
                 lineTension: 0.4,
               };
             }),
-            options: {
-              scales: {
-                y: {
-                  suggestedMin: 0,
-                  suggestedMax: 3,
-                  stepSize: 3,
-                },
+          },
+          options: {
+            animation: false,
+            responsive: true,
+            plugins: {
+              legend: {
+                display: false, // 凡例を非表示にする
               },
-              animation: false,
-              responsive: true,
-              maintainAspectRatio: false,
             },
           },
         });
@@ -827,38 +839,68 @@
             class_name: "",
             name: "土",
             year: [Total(-1, 20), Total(0, 20), Total(1, 20), Total(2, 20)],
-            color: "#bc7b3d",
+            color: "#243f6b",
           },
           {
             class_name: "",
             name: "水",
             year: [Total(-1, 12), Total(0, 12), Total(1, 12), Total(2, 12)],
-            color: "#96b9d9",
+            color: "#243f6b",
           },
           {
             class_name: "",
             name: "風",
             year: [Total(-1, 6), Total(0, 6), Total(1, 6), Total(2, 6)],
-            color: "#a4bfda",
+            color: "#EDCD35",
           },
           {
             class_name: "",
             name: "火",
             year: [Total(-1, 4), Total(0, 4), Total(1, 4), Total(2, 4)],
-            color: "#f2c572",
+            color: "#243f6b",
+          },
+          {
+            class_name: "overview",
+            name: "概要",
+            year: [
+              Overview(Total(-1, 20)),
+              Overview(Total(0, 20)),
+              Overview(Total(1, 20)),
+              Overview(Total(2, 20)),
+            ],
           },
         ];
       };
+
+      const Overview = (number) => {
+        switch (number) {
+          case 0:
+            return "健康";
+          case 1:
+            return "過多";
+          case 2:
+            return "枯渇";
+          case 3:
+            return "ピガーン";
+        }
+      };
+
       const GenerateTable = (array) => {
-        const table = array.reduce((acc, cur) => {
+        const name = array.map(({ name }) => name);
+        const year = array.map(({ year }) => year);
+        const transposed = year[0].map((_, index) =>
+          year.map((row) => row[index])
+        );
+        const table = [name].concat(transposed).reduce((acc, cur) => {
           return (
             acc +
-            `<tr class="${cur.class_name}">
-              <th>${cur.name}</th>
-              <td>${cur.year[0]}</td>
-              <td>${cur.year[1]}</td>
-              <td>${cur.year[2]}</td>
-              <td>${cur.year[3]}</td>
+            `<tr>
+              <th>${cur[0]}</th>
+              <td>${cur[1]}</td>
+              <td>${cur[2]}</td>
+              <td>${cur[3]}</td>
+              <td>${cur[4]}</td>
+              <td>${cur[5]}</td>
             </tr>`
           );
         }, "");
@@ -866,7 +908,29 @@
       };
       const Draw = (data) => {
         const table = document.getElementById("app_table");
-        table.innerHTML = data;
+        const info = document.getElementById("info");
+        table.innerHTML = data.table;
+        info.innerHTML = `
+        診断日：${FormatDate("")}
+        <br/>
+        誕生日：${FormatDate(data.date)}
+        `;
+      };
+
+      const FormatDate = (data) => {
+        // 年、月、日を取得
+        let date;
+        if (data) {
+          date = new Date(data);
+        } else {
+          date = new Date();
+        }
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        // フォーマットして返す
+        return `${year}年${month}月${day}日`;
       };
     </script>
   </body>
