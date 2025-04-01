@@ -707,7 +707,7 @@
         eto_number = Eto(birthday);
         if (!eto_number) return;
 
-        const array = Calu();
+        const array = Calu(birthday);
         const table = GenerateTable(array);
         Draw({ table: table, date: birthday });
 
@@ -828,45 +828,71 @@
         );
       };
 
-      const Calu = () => {
+      const Calu = (birthday) => {
+        let a = -1;
         return [
           {
             class_name: "age",
             name: "年齢",
-            year: [age_number - 1, age_number, age_number + 1, age_number + 2],
+            year: [
+              age_number + 0 + a,
+              age_number + 1 + a,
+              age_number + 2 + a,
+              age_number + 3 + a,
+            ],
           },
           {
             class_name: "",
             name: "土",
-            year: [Total(-1, 20), Total(0, 20), Total(1, 20), Total(2, 20)],
+            year: [
+              Total(0 + a, 20),
+              Total(1 + a, 20),
+              Total(2 + a, 20),
+              Total(3 + a, 20),
+            ],
             color: "#243f6b",
           },
           {
             class_name: "",
             name: "水",
-            year: [Total(-1, 12), Total(0, 12), Total(1, 12), Total(2, 12)],
+            year: [
+              Total(0 + a, 12),
+              Total(1 + a, 12),
+              Total(2 + a, 12),
+              Total(3 + a, 12),
+            ],
             color: "#243f6b",
           },
           {
             class_name: "",
             name: "風",
-            year: [Total(-1, 6), Total(0, 6), Total(1, 6), Total(2, 6)],
+            year: [
+              Total(0 + a, 6),
+              Total(1 + a, 6),
+              Total(2 + a, 6),
+              Total(3 + a, 6),
+            ],
             color: "#EDCD35",
           },
           {
             class_name: "",
             name: "火",
-            year: [Total(-1, 4), Total(0, 4), Total(1, 4), Total(2, 4)],
+            year: [
+              Total(0 + a, 4),
+              Total(1 + a, 4),
+              Total(2 + a, 4),
+              Total(3 + a, 4),
+            ],
             color: "#243f6b",
           },
           {
             class_name: "overview",
             name: "概要",
             year: [
-              Overview(Total(-1, 20)),
-              Overview(Total(0, 20)),
-              Overview(Total(1, 20)),
-              Overview(Total(2, 20)),
+              Overview(Total(0 + a, 20)),
+              Overview(Total(1 + a, 20)),
+              Overview(Total(2 + a, 20)),
+              Overview(Total(3 + a, 20)),
             ],
           },
         ];
